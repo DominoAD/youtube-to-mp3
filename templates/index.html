@@ -1,0 +1,732 @@
+<!--
+┌───────────────────────────────────────────────────────────┐
+│ YOUTUBE MP3 DOWNLOADER - WEB INTERFACE                    │
+│ Author:  Aidan                                            │
+│ Created: 2026-01-29                                       │
+│ Updated: 2026-02-01                                       │
+│ Version: 3.0                                              │
+│ Features: YouTube converter with voice cleaning UI        │
+│                                                           │
+│ Description:                                              │
+│ Frontend web interface for YouTube to MP3 converter.      │
+│ Includes real-time progress tracking, voice cleaning      │
+│ controls, and responsive design for all devices.          │
+│                                                           │
+│ Key Components:                                           │
+│ - YouTube URL input with validation                       │
+│ - Optional voice cleaning toggle                          │
+│ - Real-time download progress tracking                    │
+│ - MP3 file upload for voice cleaning                      │
+│ - Responsive mobile-friendly design                       │
+│ - JavaScript AJAX for async operations                    │
+│                                                           │
+│ Technologies:                                             │
+│ - HTML5 for structure                                     │
+│ - Font Awesome 6.0 for icons                              │
+│ - Vanilla JavaScript (no jQuery)                          │
+│ - Fetch API for backend communication                     │
+│ - Flask Jinja2 templating                                 │
+└───────────────────────────────────────────────────────────┘
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ===== METADATA ===== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube to MP3 Converter</title>
+    
+    <!-- ===== STYLESHEETS ===== -->
+    <!-- Custom CSS for application styling -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Font Awesome for icons (download, music, etc.) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- ===== HEADER SECTION ===== -->
+        <!-- Main title and subtitle -->
+        <header>
+            <h1><i class="fas fa-music"></i> YouTube to MP3 Converter</h1>
+            <p class="subtitle">Convert YouTube videos to high-quality MP3 audio files</p>
+        </header>
+
+        <!-- ===== COPYRIGHT DISCLAIMER ===== -->
+        <!-- Legal notice about content ownership and copyright -->
+        <div class="disclaimer">
+            <p><i class="fas fa-exclamation-triangle"></i> <strong>Disclaimer:</strong> Only download content you own or have permission to download. Respect copyright laws.</p>
+        </div>
+
+        <main>
+            <!-- ===== YOUTUBE TO MP3 CONVERTER SECTION ===== -->
+            <div class="converter-box">
+                <!-- Input section for YouTube URL and options -->
+                <div class="input-section">
+                    <!-- YouTube URL input field -->
+                    <div class="url-input">
+                        <i class="fas fa-link"></i>
+                        <input type="text" id="youtubeUrl" placeholder="Paste YouTube URL here...">
+                    </div>
+                    
+                    <!-- Toggle for optional voice cleaning feature -->
+                    <div class="voice-clean-toggle">
+                        <label class="toggle-container">
+                            <input type="checkbox" id="cleanVoiceToggle">
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-label">
+                                <i class="fas fa-magic"></i> Auto-clean voice (remove background noise)
+                            </span>
+                        </label>
+                    </div>
+                    
+                    <!-- Convert button to start download -->
+                    <button id="downloadBtn" class="btn-primary">
+                        <i class="fas fa-download"></i> Convert to MP3
+                    </button>
+                </div>
+
+                <!-- ===== INSTRUCTIONS ===== -->
+                <!-- Step-by-step guide for users -->
+                <div class="instructions">
+                    <h3>How to use:</h3>
+                    <ol>
+                        <li>Copy the URL of a YouTube video</li>
+                        <li>Paste it in the box above</li>
+                        <li>Click "Convert to MP3"</li>
+                        <li>Wait for conversion and download</li>
+                    </ol>
+                </div>
+
+                <!-- ===== PROGRESS SECTION ===== -->
+                <!-- Shows real-time download/conversion progress -->
+                <!-- Hidden by default, shown when download starts -->
+                <div id="progressSection" class="progress-section" style="display: none;">
+                    <!-- Progress header with status text -->
+                    <div class="progress-header">
+                        <h3>Conversion Progress</h3>
+                        <!-- Dynamic status text updated by JavaScript -->
+                        <span id="statusText">Initializing...</span>
+                    </div>
+                    
+                    <!-- Progress bar container -->
+                    <div class="progress-container">
+                        <!-- Visual progress bar (fills 0-100%) -->
+                        <div class="progress-bar">
+                            <div id="progressFill" class="progress-fill"></div>
+                        </div>
+                        <!-- Percentage text display -->
+                        <span id="progressText">0%</span>
+                    </div>
+
+                    <!-- Video information display (populated after metadata fetch) -->
+                    <div id="videoInfo" class="video-info"></div>
+
+                    <!-- Action buttons -->
+                    <div class="actions">
+                        <!-- Cancel button to abort download -->
+                        <button id="cancelBtn" class="btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                        <!-- Download button (appears when conversion complete) -->
+                        <button id="downloadFileBtn" class="btn-primary" style="display: none;">
+                            <i class="fas fa-file-download"></i> Download MP3
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ===== ERROR SECTION ===== -->
+                <!-- Displays error messages if conversion fails -->
+                <!-- Hidden by default, shown on error -->
+                <div id="errorSection" class="error-section" style="display: none;">
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <!-- Dynamic error message inserted by JavaScript -->
+                        <span id="errorText"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== FEATURES SECTION ===== -->
+            <!-- Highlights key features of the application -->
+            <div class="features">
+                <h2>Features</h2>
+                <div class="features-grid">
+                    <!-- Feature 1: Fast conversion -->
+                    <div class="feature">
+                        <i class="fas fa-bolt"></i>
+                        <h3>Fast Conversion</h3>
+                        <p>Quickly convert videos to MP3 format</p>
+                    </div>
+                    <!-- Feature 2: High quality audio -->
+                    <div class="feature">
+                        <i class="fas fa-headphones"></i>
+                        <h3>High Quality</h3>
+                        <p>192kbps MP3 audio quality</p>
+                    </div>
+                    <!-- Feature 3: Security and privacy -->
+                    <div class="feature">
+                        <i class="fas fa-shield-alt"></i>
+                        <h3>Safe & Secure</h3>
+                        <p>Files are automatically deleted after 24 hours</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== VOICE CLEANING SECTION ===== -->
+            <!-- Standalone voice isolation tool for uploaded MP3 files -->
+            <div class="voice-cleaner-section">
+                <h2><i class="fas fa-microphone"></i> Voice Isolation Tool</h2>
+                <p class="section-description">Remove background noise, rain, and white noise from your MP3 files</p>
+                
+                <div class="converter-box">
+                    <!-- File upload section -->
+                    <div class="upload-section">
+                        <!-- Hidden file input (triggered by button) -->
+                        <div class="file-upload">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <input type="file" id="mp3File" accept=".mp3" style="display: none;">
+                            <!-- Custom file select button -->
+                            <button id="selectFileBtn" class="btn-secondary">
+                                <i class="fas fa-file-audio"></i> Select MP3 File
+                            </button>
+                            <!-- Shows selected filename -->
+                            <span id="selectedFileName" class="selected-file"></span>
+                        </div>
+                        <!-- Clean button (appears after file selection) -->
+                        <button id="cleanVoiceBtn" class="btn-primary" style="display: none;">
+                            <i class="fas fa-magic"></i> Clean Voice
+                        </button>
+                    </div>
+
+                    <div id="cleanProgressSection" class="progress-section" style="display: none;">
+                        <div class="progress-header">
+                            <h3>Processing Audio</h3>
+                            <span id="cleanStatusText">Initializing...</span>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div id="cleanProgressFill" class="progress-fill"></div>
+                            </div>
+                            <span id="cleanProgressText">0%</span>
+                        </div>
+
+                        <div class="actions">
+                            <button id="cancelCleanBtn" class="btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                            <button id="downloadCleanBtn" class="btn-primary" style="display: none;">
+                                <i class="fas fa-file-download"></i> Download Cleaned MP3
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="cleanErrorSection" class="error-section" style="display: none;">
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span id="cleanErrorText"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cleaning-info">
+                    <h3>How Voice Cleaning Works:</h3>
+                    <ul>
+                        <li><strong>Noise Reduction:</strong> Removes constant background noise like rain, wind, and hiss</li>
+                        <li><strong>Frequency Filtering:</strong> Isolates human voice frequencies (80-3000 Hz)</li>
+                        <li><strong>Harmonic Enhancement:</strong> Emphasizes voice harmonics while reducing percussive sounds</li>
+                        <li><strong>Smart Processing:</strong> Uses AI-based algorithms to preserve voice quality</li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p><strong>Important:</strong> This tool is for educational purposes. Always respect copyright laws and YouTube's Terms of Service.</p>
+            <p class="copyright">© 2024 YouTube to MP3 Converter</p>
+        </footer>
+    </div>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        // =====================================================
+        // GLOBAL STATE MANAGEMENT
+        // =====================================================
+        
+        // YouTube download tracking
+        let currentDownloadId = null;   // UUID of active download
+        let statusInterval = null;      // Interval timer for polling status
+        let retryCount = 0;             // Failed status check counter
+        const MAX_RETRIES = 3;          // Maximum retry attempts before giving up
+
+        // Voice cleaner tracking
+        let currentProcessId = null;    // UUID of active voice cleaning process
+        let cleanStatusInterval = null; // Interval timer for polling clean status
+        let selectedFile = null;        // Selected MP3 file for cleaning
+
+        // =====================================================
+        // EVENT LISTENERS - YOUTUBE DOWNLOADER
+        // =====================================================
+        
+        // Attach event listeners for YouTube download functionality
+        document.getElementById('downloadBtn').addEventListener('click', startDownload);
+        document.getElementById('cancelBtn').addEventListener('click', cancelDownload);
+        document.getElementById('downloadFileBtn').addEventListener('click', downloadFile);
+        
+        console.log('Event listeners attached successfully');
+        
+        // =====================================================
+        // EVENT LISTENERS - VOICE CLEANER
+        // =====================================================
+        
+        // Trigger hidden file input when button clicked
+        document.getElementById('selectFileBtn').addEventListener('click', () => {
+            document.getElementById('mp3File').click();
+        });
+        
+        // Handle file selection
+        document.getElementById('mp3File').addEventListener('change', handleFileSelect);
+        document.getElementById('cleanVoiceBtn').addEventListener('click', startVoiceCleaning);
+        document.getElementById('cancelCleanBtn').addEventListener('click', cancelCleaning);
+        document.getElementById('downloadCleanBtn').addEventListener('click', downloadCleanedFile);
+        
+        // =====================================================
+        // KEYBOARD SHORTCUTS
+        // =====================================================
+        
+        // Allow Enter key to submit YouTube URL
+        document.getElementById('youtubeUrl').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                startDownload();
+            }
+        });
+
+        // =====================================================
+        // FILE UPLOAD HANDLER
+        // =====================================================
+        
+        /**
+         * Handle MP3 file selection for voice cleaning
+         * 
+         * Validates file type and size before accepting upload.
+         * Shows filename and enables clean button on success.
+         * 
+         * Validation Rules:
+         * - Must be .mp3 file
+         * - Maximum size: 100MB
+         * 
+         * @param {Event} e - File input change event
+         */
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Validate file extension
+                if (!file.name.endsWith('.mp3')) {
+                    showCleanError('Please select an MP3 file');
+                    return;
+                }
+                // Validate file size (100MB limit)
+                if (file.size > 100 * 1024 * 1024) {
+                    showCleanError('File is too large (max 100MB)');
+                    return;
+                }
+                // File is valid - store and show UI
+                selectedFile = file;
+                document.getElementById('selectedFileName').textContent = file.name;
+                document.getElementById('cleanVoiceBtn').style.display = 'inline-block';
+                hideCleanError();
+            }
+        }
+
+        // =====================================================
+        // VOICE CLEANING FUNCTIONS
+        // =====================================================
+        
+        /**
+         * Start voice cleaning process for uploaded file
+         * 
+         * Workflow:
+         * 1. Validate file is selected
+         * 2. Upload file to server (/upload endpoint)
+         * 3. Receive process ID from server
+         * 4. Start voice cleaning (/clean_voice endpoint)
+         * 5. Begin polling status for progress updates
+         * 
+         * Shows progress UI and disables buttons during processing.
+         * Handles network errors and server rejections gracefully.
+         */
+        async function startVoiceCleaning() {
+            // Validate file selection
+            if (!selectedFile) {
+                showCleanError('Please select a file first');
+                return;
+            }
+
+            // Reset UI for new processing session
+            hideCleanError();
+            document.getElementById('cleanProgressSection').style.display = 'block';
+            document.getElementById('cleanProgressFill').style.width = '0%';
+            document.getElementById('cleanProgressText').textContent = '0%';
+            document.getElementById('cleanStatusText').textContent = 'Uploading...';
+            document.getElementById('downloadCleanBtn').style.display = 'none';
+
+            // Disable and update clean button
+            const cleanBtn = document.getElementById('cleanVoiceBtn');
+            cleanBtn.disabled = true;
+            cleanBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+            try {
+                // ===== STEP 1: UPLOAD FILE =====
+                // Send file to server using multipart/form-data
+                const formData = new FormData();
+                formData.append('file', selectedFile);
+
+                const uploadResponse = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData  // FormData automatically sets Content-Type
+                });
+
+                const uploadData = await uploadResponse.json();
+
+                // Check for upload errors
+                if (!uploadResponse.ok) {
+                    showCleanError(uploadData.error || 'Upload failed');
+                    resetCleanButton();
+                    return;
+                }
+
+                // Store process ID for status tracking
+                currentProcessId = uploadData.process_id;
+                document.getElementById('cleanStatusText').textContent = 'Processing audio...';
+
+                // ===== STEP 2: START VOICE CLEANING =====
+                // Trigger server-side processing
+                const processResponse = await fetch(`/clean_voice/${currentProcessId}`, {
+                    method: 'POST'
+                });
+
+                if (!processResponse.ok) {
+                    const errorData = await processResponse.json();
+                    showCleanError(errorData.error || 'Processing failed');
+                    resetCleanButton();
+                    return;
+                }
+
+                // ===== STEP 3: START STATUS POLLING =====
+                startCleanStatusCheck();
+
+            } catch (error) {
+                // Handle network errors (server down, no internet, etc.)
+                console.error('Voice cleaning error:', error);
+                showCleanError('Network error. Please try again.');
+                resetCleanButton();
+            }
+        }
+
+        function startCleanStatusCheck() {
+            if (cleanStatusInterval) clearInterval(cleanStatusInterval);
+
+            cleanStatusInterval = setInterval(async () => {
+                try {
+                    const response = await fetch(`/clean_status/${currentProcessId}`);
+
+                    if (!response.ok) {
+                        throw new Error('Status check failed');
+                    }
+
+                    const status = await response.json();
+
+                    if (status.status === 'processing' || status.status === 'uploaded') {
+                        const progress = status.progress || 0;
+                        document.getElementById('cleanProgressFill').style.width = `${progress}%`;
+                        document.getElementById('cleanProgressText').textContent = `${progress}%`;
+                        
+                        if (progress < 40) {
+                            document.getElementById('cleanStatusText').textContent = 'Loading audio...';
+                        } else if (progress < 80) {
+                            document.getElementById('cleanStatusText').textContent = 'Isolating voice...';
+                        } else {
+                            document.getElementById('cleanStatusText').textContent = 'Saving file...';
+                        }
+                    } else if (status.status === 'completed') {
+                        clearInterval(cleanStatusInterval);
+                        document.getElementById('cleanProgressFill').style.width = '100%';
+                        document.getElementById('cleanProgressText').textContent = '100%';
+                        document.getElementById('cleanStatusText').textContent = '✓ Voice cleaning completed!';
+                        document.getElementById('downloadCleanBtn').style.display = 'inline-block';
+                        resetCleanButton();
+                    } else if (status.status === 'error') {
+                        clearInterval(cleanStatusInterval);
+                        showCleanError(status.error || 'Processing failed');
+                        resetCleanButton();
+                    }
+                } catch (error) {
+                    console.error('Status check error:', error);
+                    clearInterval(cleanStatusInterval);
+                    showCleanError('Connection lost. Please try again.');
+                    resetCleanButton();
+                }
+            }, 1000);
+        }
+
+        function cancelCleaning() {
+            if (cleanStatusInterval) clearInterval(cleanStatusInterval);
+            document.getElementById('cleanProgressSection').style.display = 'none';
+            resetCleanButton();
+            currentProcessId = null;
+            hideCleanError();
+        }
+
+        function downloadCleanedFile() {
+            if (currentProcessId) {
+                window.location.href = `/get_cleaned/${currentProcessId}`;
+                setTimeout(() => {
+                    selectedFile = null;
+                    document.getElementById('mp3File').value = '';
+                    document.getElementById('selectedFileName').textContent = '';
+                    document.getElementById('cleanProgressSection').style.display = 'none';
+                    document.getElementById('cleanVoiceBtn').style.display = 'none';
+                }, 2000);
+            }
+        }
+
+        function resetCleanButton() {
+            const cleanBtn = document.getElementById('cleanVoiceBtn');
+            cleanBtn.disabled = false;
+            cleanBtn.innerHTML = '<i class="fas fa-magic"></i> Clean Voice';
+        }
+
+        function showCleanError(message) {
+            document.getElementById('cleanErrorText').textContent = message;
+            document.getElementById('cleanErrorSection').style.display = 'block';
+            document.getElementById('cleanProgressSection').style.display = 'none';
+        }
+
+        function hideCleanError() {
+            document.getElementById('cleanErrorSection').style.display = 'none';
+        }
+
+        // =====================================================\n        // YOUTUBE DOWNLOAD FUNCTIONS\n        // =====================================================\n        \n        /**\n         * Initialize YouTube to MP3 download\n         * \n         * Main entry point for YouTube conversion. Validates URL,\n         * sends request to backend, and starts progress monitoring.\n         * \n         * Workflow:\n         * 1. Validate YouTube URL format\n         * 2. Check voice cleaning preference\n         * 3. Send POST request to /download endpoint\n         * 4. Receive download ID\n         * 5. Start polling /status endpoint for progress\n         * \n         * Validation:\n         * - URL must not be empty\n         * - URL must contain 'youtube.com' or 'youtu.be'\n         * \n         * Error Handling:\n         * - Network errors: Show retry message\n         * - Server busy: Show capacity error\n         * - Invalid URL: Show validation error\n         */\n        async function startDownload() {
+            console.log('startDownload called');
+            const url = document.getElementById('youtubeUrl').value.trim();
+            const cleanVoice = document.getElementById('cleanVoiceToggle').checked;
+            
+            console.log('URL:', url, 'Clean voice:', cleanVoice);
+            
+            if (!url) {
+                showError('Please enter a YouTube URL');
+                return;
+            }
+            
+            // Basic URL validation
+            if (!url.includes('youtube.com') && !url.includes('youtu.be')) {
+                showError('Please enter a valid YouTube URL (youtube.com or youtu.be)');
+                return;
+            }
+
+            // Reset UI
+            hideError();
+            document.getElementById('progressSection').style.display = 'block';
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('progressText').textContent = '0%';
+            document.getElementById('statusText').textContent = cleanVoice ? 'Starting download...' : 'Starting...';
+            document.getElementById('downloadFileBtn').style.display = 'none';
+            document.getElementById('videoInfo').innerHTML = '';
+            retryCount = 0;
+
+            // Disable download button
+            const downloadBtn = document.getElementById('downloadBtn');
+            downloadBtn.disabled = true;
+            downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+            try {
+                const response = await fetch('/download', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `url=${encodeURIComponent(url)}&clean_voice=${cleanVoice}`
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentDownloadId = data.download_id;
+                    startStatusCheck();
+                } else {
+                    showError(data.error || 'Failed to start download');
+                    resetDownloadButton();
+                }
+            } catch (error) {
+                console.error('Download error:', error);
+                showError('Network error. Please check your connection and try again.');
+                resetDownloadButton();
+            }
+        }
+
+        function startStatusCheck() {
+            if (statusInterval) clearInterval(statusInterval);
+            
+            statusInterval = setInterval(async () => {
+                try {
+                    const response = await fetch(`/status/${currentDownloadId}`);
+                    
+                    if (!response.ok) {
+                        throw new Error('Status check failed');
+                    }
+                    
+                    const status = await response.json();
+                    retryCount = 0; // Reset retry count on successful fetch
+                    
+                    if (status.status === 'downloading') {
+                        const progress = status.progress || 0;
+                        document.getElementById('progressFill').style.width = `${progress}%`;
+                        document.getElementById('progressText').textContent = `${progress}%`;
+                        document.getElementById('statusText').textContent = 'Downloading and converting...';
+                        
+                        if (status.title) {
+                            document.getElementById('videoInfo').innerHTML = 
+                                `<p><strong>Converting:</strong> ${escapeHtml(status.title)}</p>`;
+                        }
+                    } else if (status.status === 'cleaning') {
+                        const progress = status.progress || 0;
+                        document.getElementById('progressFill').style.width = `${progress}%`;
+                        document.getElementById('progressText').textContent = `${progress}%`;
+                        document.getElementById('statusText').textContent = '🎤 Cleaning voice...';
+                        
+                        if (status.title) {
+                            document.getElementById('videoInfo').innerHTML = 
+                                `<p><strong>Removing background noise from:</strong> ${escapeHtml(status.title)}</p>`;
+                        }
+                    } else if (status.status === 'completed') {
+                        clearInterval(statusInterval);
+                        document.getElementById('progressFill').style.width = '100%';
+                        document.getElementById('progressText').textContent = '100%';
+                        document.getElementById('statusText').textContent = '✓ Completed!';
+                        document.getElementById('downloadFileBtn').style.display = 'inline-block';
+                        resetDownloadButton();
+                        
+                        // Auto-download after 2 seconds
+                        setTimeout(() => {
+                            if (currentDownloadId) {
+                                downloadFile();
+                            }
+                        }, 2000);
+                    } else if (status.status === 'error') {
+                        clearInterval(statusInterval);
+                        showError(status.error || 'Conversion failed. Please try again.');
+                        resetDownloadButton();
+                    } else if (status.status === 'not_found') {
+                        clearInterval(statusInterval);
+                        showError('Download session expired. Please try again.');
+                        resetDownloadButton();
+                    }
+                } catch (error) {
+                    console.error('Status check error:', error);
+                    retryCount++;
+                    
+                    if (retryCount >= MAX_RETRIES) {
+                        clearInterval(statusInterval);
+                        showError('Lost connection to server. Please try again.');
+                        resetDownloadButton();
+                    }
+                }
+            }, 1000);
+        }
+
+        function cancelDownload() {
+            if (statusInterval) clearInterval(statusInterval);
+            document.getElementById('progressSection').style.display = 'none';
+            resetDownloadButton();
+            currentDownloadId = null;
+            hideError();
+        }
+
+
+        function downloadFile() {
+            if (currentDownloadId) {
+                window.location.href = `/get_file/${currentDownloadId}`;
+                // Clear input after download
+                setTimeout(() => {
+                    document.getElementById('youtubeUrl').value = '';
+                    document.getElementById('progressSection').style.display = 'none';
+                }, 3000);
+            }
+        }
+        
+        function resetDownloadButton() {
+            const downloadBtn = document.getElementById('downloadBtn');
+            downloadBtn.disabled = false;
+            downloadBtn.innerHTML = '<i class="fas fa-download"></i> Convert to MP3';
+        }
+
+        function showError(message) {
+            document.getElementById('errorText').textContent = message;
+            document.getElementById('errorSection').style.display = 'block';
+            document.getElementById('progressSection').style.display = 'none';
+        }
+
+        function hideError() {
+            document.getElementById('errorSection').style.display = 'none';
+        }
+        
+        // =====================================================
+        // UTILITY FUNCTIONS
+        // =====================================================
+        
+        /**
+         * Escape HTML to prevent XSS attacks
+         * 
+         * Converts special characters to HTML entities to safely
+         * display user-generated content (like video titles) without
+         * allowing script injection.
+         * 
+         * @param {string} text - Text to escape
+         * @returns {string} HTML-safe text
+         * 
+         * Security:
+         * Prevents cross-site scripting (XSS) attacks by escaping
+         * special characters like <, >, &, ", and '.
+         * 
+         * Example:
+         *   escapeHtml('<script>alert("XSS")</script>')
+         *   // Returns: '&lt;script&gt;alert(&quot;XSS&quot;)&lt;/script&gt;'
+         */
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;  // textContent auto-escapes
+            return div.innerHTML;    // Get escaped HTML
+        }
+
+        // =====================================================
+        // PAGE LIFECYCLE EVENTS
+        // =====================================================
+        
+        /**
+         * Auto-cleanup on page load
+         * 
+         * Triggers server cleanup of old files when user loads page.
+         * This helps maintain disk space even if users don't download.
+         * Runs silently in background - failures are ignored.
+         * 
+         * Called automatically when page finishes loading.
+         */
+        window.addEventListener('load', () => {
+            fetch('/cleanup', { method: 'POST' }).catch(() => {});
+        });
+        
+        /**
+         * Cleanup before leaving page
+         * 
+         * Stops all polling intervals to prevent memory leaks and
+         * unnecessary API calls after user navigates away.
+         * 
+         * Called automatically when user closes tab or navigates away.
+         */
+        window.addEventListener('beforeunload', () => {
+            if (statusInterval) clearInterval(statusInterval);
+        });
+    </script>
+</body>
+</html>
