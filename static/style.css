@@ -1,650 +1,113 @@
-/*
-┌───────────────────────────────────────────────────────────┐
-│ YOUTUBE MP3 DOWNLOADER - STYLESHEET                       │
-│ Author:  Aidan                                            │
-│ Created: 2026-01-29                                       │
-│ Updated: 2026-02-01                                       │
-│ Version: 3.0                                              │
-│ Features: Modern responsive design with animations        │
-│                                                           │
-│ I designed this stylesheet to make the YouTube converter  │
-│ look modern and professional. I used a purple gradient    │
-│ theme with smooth animations throughout.                  │
-│                                                           │
-│ I focused on:                                             │
-│ - Beautiful gradient backgrounds and colors               │
-│ - Smooth animations and transitions                       │
-│ - Mobile-first responsive design                          │
-│ - CSS variables for easy theming                          │
-│ - Accessible focus states for keyboard users              │
-│ - Clean, readable code with good organization             │
-└───────────────────────────────────────────────────────────┘
-*/
-
-/* =====================================================
-   GLOBAL RESET AND BASE STYLES
-   ===================================================== */
-
-/* I reset all default browser margins and padding */
-/* I use border-box sizing to make calculations easier */
 * {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;  /* I include padding/border in element width */
+    box-sizing: border-box;
 }
 
-/* =====================================================
-   CSS CUSTOM PROPERTIES (VARIABLES)
-   ===================================================== */
-
-/*
- * I defined my color scheme using CSS variables
- * This makes it easy for me to change colors everywhere
- * and keeps my design consistent
- */
-:root {
-    /* I use purple and indigo as my brand colors */
-    --primary-color: #4f46e5;      /* My main brand color */
-    --primary-dark: #4338ca;       /* I use this for hover states */
-    --secondary-color: #7c3aed;    /* I use this for accents */
-    
-    /* I use these colors for status messages */
-    --error-color: #dc2626;        /* Red for errors */
-    --success-color: #10b981;      /* Green for success */
-    --warning-color: #f39c12;      /* Orange for warnings */
-    
-    /* I use neutral colors for backgrounds and text */
-    --bg-light: #f8fafc;           /* Light backgrounds */
-    --text-dark: #1e293b;          /* Dark text for headings */
-    --text-light: #64748b;         /* Gray text for body */
-    --border-color: #e2e8f0;       /* Light borders */
-}
-
-/* =====================================================
-   BODY AND CONTAINER
-   ===================================================== */
-
-/*
- * I set up the body with my brand colors
- * I use a purple gradient background to make it look nice
- * and modern
- */
 body {
-    /* I use the system font stack for native look */
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-    line-height: 1.6;                /* I set comfortable line height */
-    color: var(--text-dark);         /* I use dark text */
-    
-    /* I use a purple gradient background */
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    
-    min-height: 100vh;               /* I make it full viewport height */
-    padding: 20px;                   /* I add breathing room */
+    font: 14px Arial, sans-serif;
+    background: #008080;
+    padding: 20px;
 }
 
-/*
- * Main content container
- * - Centered layout with max width for readability
- * - White background stands out against gradient
- * - Rounded corners for modern aesthetic
- * - Deep shadow creates card-like elevation
- * - Fade-in animation on page load
- */
 .container {
-    max-width: 800px;                /* Optimal reading width */
-    margin: 0 auto;                  /* Center horizontally */
-    background: white;               /* Clean white background */
-    border-radius: 20px;             /* Smooth rounded corners */
-    
-    /* Deep shadow creates floating card effect */
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    
-    overflow: hidden;                /* Contain child elements */
-    
-    /* Fade-in animation on load */
-    animation: fadeIn 0.5s ease-in;
-}
-
-/* =====================================================
-   ANIMATIONS
-   ===================================================== */
-
-/*
- * Fade-in animation
- * - Smooth entrance effect when page loads
- * - Moves content up while fading in
- * - Creates polished, professional feel
- */
-@keyframes fadeIn {
-    from {
-        opacity: 0;              /* Start invisible */
-        transform: translateY(20px);  /* Start 20px below */
-    }
-    to {
-        opacity: 1;              /* End fully visible */
-        transform: translateY(0);     /* End at natural position */
-    }
+    max-width: 800px;
+    margin: 0 auto;
+    background: #c0c0c0;
+    border: 2px solid #fff;
 }
 
 header {
-    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-    color: white;
-    padding: 2rem;
-    text-align: center;
-}
-
-header h1 {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.subtitle {
-    opacity: 0.9;
-    font-size: 1.1rem;
+    background: linear-gradient(90deg, #000080, #1084d0);
+    color: #fff;
+    padding: 10px;
+    font-weight: bold;
 }
 
 .disclaimer {
-    background: #fff3cd;
-    border: 1px solid #ffeaa7;
-    padding: 1rem;
-    margin: 1rem;
-    border-radius: 10px;
-    font-size: 0.9rem;
+    background: #ff0;
+    border: 2px solid #000;
+    padding: 10px;
+    margin: 10px;
 }
 
-.disclaimer i {
-    color: #f39c12;
-    margin-right: 0.5rem;
-}
-
-.converter-box {
-    padding: 2rem;
-}
-
-.input-section {
-    background: #f8fafc;
-    padding: 2rem;
-    border-radius: 15px;
-    margin-bottom: 2rem;
-    border: 2px dashed #cbd5e1;
-}
-
-.voice-clean-toggle {
-    margin: 1rem 0;
-}
-
-.toggle-container {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    user-select: none;
-    gap: 0.75rem;
-}
-
-.toggle-container input[type="checkbox"] {
-    display: none;
-}
-
-.toggle-slider {
-    position: relative;
-    width: 50px;
-    height: 26px;
-    background: #cbd5e1;
-    border-radius: 13px;
-    transition: background 0.3s ease;
-    flex-shrink: 0;
-}
-
-.toggle-slider::before {
-    content: '';
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: white;
-    top: 3px;
-    left: 3px;
-    transition: transform 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.toggle-container input[type="checkbox"]:checked + .toggle-slider {
-    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-}
-
-.toggle-container input[type="checkbox"]:checked + .toggle-slider::before {
-    transform: translateX(24px);
-}
-
-.toggle-label {
-    color: #475569;
-    font-weight: 500;
-    font-size: 0.95rem;
-}
-
-.toggle-label i {
-    color: var(--primary-color);
-    margin-right: 0.25rem;
+.input-section,
+.instructions,
+.features {
+    padding: 15px;
+    margin: 10px;
 }
 
 .url-input {
+    background: #fff;
+    padding: 5px;
     display: flex;
-    align-items: center;
-    background: white;
-    padding: 1rem;
-    border-radius: 10px;
-    margin-bottom: 1rem;
-    border: 2px solid #e2e8f0;
-    transition: all 0.3s ease;
-}
-
-.url-input:focus-within {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-}
-
-.url-input i {
-    color: var(--primary-color);
-    font-size: 1.2rem;
-    margin-right: 1rem;
+    margin: 10px 0;
 }
 
 .url-input input {
     flex: 1;
-    border: none;
-    outline: none;
-    font-size: 1rem;
-    padding: 0.5rem 0;
+    border: 0;
+    outline: 0;
+    padding: 5px;
 }
 
-.url-input input::placeholder {
-    color: #94a3b8;
-}
-
-
-.btn-primary, .btn-secondary {
-    padding: 1rem 2rem;
-    font-size: 1.1rem;
-    border: none;
-    border-radius: 10px;
+button {
+    background: #c0c0c0;
+    border: 2px solid;
+    border-color: #fff #000 #000 #fff;
+    padding: 10px 20px;
+    font-weight: bold;
     cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.btn-primary::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-}
-
-.btn-primary:hover::before {
-    width: 300px;
-    height: 300px;
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-    color: white;
     width: 100%;
+    margin-top: 10px;
 }
 
-.btn-primary:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4);
+.progress-bar {
+    height: 20px;
+    background: #ddd;
+    margin: 10px 0;
 }
 
-.btn-primary:active:not(:disabled) {
-    transform: translateY(0);
+.progress-fill {
+    height: 100%;
+    background: #000080;
+    width: 0;
+    transition: width 0.3s;
 }
 
-.btn-primary:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
+.error-message {
+    color: #f00;
+    background: #fcc;
+    padding: 10px;
+    margin: 10px;
 }
 
-.btn-secondary {
-    background: #e2e8f0;
-    color: #475569;
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
 }
 
-.btn-secondary:hover {
-    background: #cbd5e1;
-    transform: translateY(-2px);
+.feature {
+    padding: 20px;
+    text-align: center;
+    border: 1px solid #999;
+}
+
+footer {
+    padding: 10px;
+    text-align: center;
+    font-size: 11px;
 }
 
 @keyframes spin {
-    from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
 }
 
 .fa-spinner {
     animation: spin 1s linear infinite;
-}
-
-.instructions {
-    background: #f1f5f9;
-    padding: 1.5rem;
-    border-radius: 10px;
-    margin-bottom: 2rem;
-}
-
-.instructions h3 {
-    color: #475569;
-    margin-bottom: 1rem;
-}
-
-.instructions ol {
-    padding-left: 1.5rem;
-}
-
-.instructions li {
-    margin-bottom: 0.5rem;
-    color: #64748b;
-}
-
-.progress-section {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 15px;
-    border: 2px solid #e2e8f0;
-    margin-bottom: 2rem;
-    animation: slideDown 0.3s ease;
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.progress-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-}
-
-.progress-header h3 {
-    color: #475569;
-}
-
-.progress-container {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-.progress-bar {
-    flex: 1;
-    height: 10px;
-    background: #e2e8f0;
-    border-radius: 5px;
-    overflow: hidden;
-}
-
-.progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #4f46e5, #7c3aed);
-    width: 0%;
-    transition: width 0.3s ease;
-    border-radius: 5px;
-}
-
-#progressText {
-    font-weight: 600;
-    color: var(--primary-color);
-    min-width: 50px;
-}
-
-#statusText {
-    color: var(--text-light);
-    font-size: 0.9rem;
-    font-weight: 500;
-}
-
-.video-info {
-    background: #f8fafc;
-    padding: 1rem;
-    border-radius: 10px;
-    margin-bottom: 1.5rem;
-}
-
-.actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
-}
-
-.error-section {
-    background: #fee2e2;
-    border: 1px solid #fecaca;
-    padding: 1rem;
-    border-radius: 10px;
-    margin-top: 1rem;
-    animation: shake 0.5s ease;
-}
-
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-10px); }
-    75% { transform: translateX(10px); }
-}
-
-.error-message {
-    display: flex;
-    align-items: center;
-    color: var(--error-color);
-}
-
-.error-message i {
-    margin-right: 0.5rem;
-    font-size: 1.2rem;
-}
-
-.features {
-    margin-top: 3rem;
-}
-
-.features h2 {
-    text-align: center;
-    margin-bottom: 2rem;
-    color: #1e293b;
-}
-
-.features-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2rem;
-}
-
-.feature {
-    text-align: center;
-    padding: 1.5rem;
-    background: var(--bg-light);
-    border-radius: 10px;
-    transition: all 0.3s ease;
-}
-
-.feature:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-}
-
-.feature i {
-    font-size: 2rem;
-    color: var(--primary-color);
-    margin-bottom: 1rem;
-}
-
-.feature h3 {
-    color: #475569;
-    margin-bottom: 0.5rem;
-}
-
-.feature p {
-    color: #64748b;
-    font-size: 0.9rem;
-}
-
-/* Voice Cleaner Section */
-.voice-cleaner-section {
-    margin-top: 3rem;
-    padding: 2rem;
-    background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
-    border-top: 3px solid var(--primary-color);
-}
-
-.voice-cleaner-section h2 {
-    text-align: center;
-    color: #1e293b;
-    margin-bottom: 0.5rem;
-}
-
-.section-description {
-    text-align: center;
-    color: var(--text-light);
-    margin-bottom: 2rem;
-    font-size: 1.1rem;
-}
-
-.upload-section {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    align-items: center;
-}
-
-.file-upload {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    width: 100%;
-}
-
-.file-upload i {
-    font-size: 3rem;
-    color: var(--primary-color);
-}
-
-.selected-file {
-    color: var(--success-color);
-    font-weight: 500;
-    margin-top: 0.5rem;
-    text-align: center;
-}
-
-.cleaning-info {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 15px;
-    margin-top: 2rem;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-.cleaning-info h3 {
-    color: #475569;
-    margin-bottom: 1rem;
-}
-
-.cleaning-info ul {
-    list-style: none;
-    padding: 0;
-}
-
-.cleaning-info li {
-    padding: 0.8rem;
-    margin-bottom: 0.5rem;
-    background: var(--bg-light);
-    border-radius: 8px;
-    color: #64748b;
-}
-
-.cleaning-info li strong {
-    color: var(--primary-color);
-}
-
-footer {
-    background: #1e293b;
-    color: #cbd5e1;
-    padding: 2rem;
-    text-align: center;
-    margin-top: 3rem;
-}
-
-footer p {
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-}
-
-.copyright {
-    color: #94a3b8;
-    font-size: 0.8rem;
-    margin-top: 1rem;
-}
-
-/* =====================================================
-   RESPONSIVE DESIGN - MOBILE BREAKPOINT
-   ===================================================== */
-
-/*
- * Mobile-first responsive design
- * - Adjusts layout for screens 768px and smaller
- * - Reduces padding and font sizes
- * - Single column layouts on small screens
- * - Maintains usability on all devices
- * 
- * Breakpoint: 768px (tablets and phones)
- */
-@media (max-width: 768px) {
-    /* Reduce body padding on mobile */
-    body {
-        padding: 10px;               /* Tighter margins */
-    }
-    
-    /* Tighter border radius on mobile */
-    .container {
-        border-radius: 15px;         /* Less dramatic curves */
-    }
-    
-    /* Scale down header text */
-    header h1 {
-        font-size: 2rem;             /* Smaller title */
-    }
-    
-    /* Reduce converter box padding */
-    .converter-box {
-        padding: 1rem;               /* More compact */
-    }
-    
-    /* Reduce input section padding */
-    .input-section {
-        padding: 1rem;               /* More compact */
-    }
-    
-    /* Single column feature grid on mobile */
-    .features-grid {
-        grid-template-columns: 1fr;  /* Stack features vertically */
-    }
 }
