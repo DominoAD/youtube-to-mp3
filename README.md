@@ -1,127 +1,102 @@
 # YouTube to MP3 Converter
 
-A modern, user-friendly web application for converting YouTube videos to high-quality MP3 audio files.
+A simple web app that grabs audio from YouTube videos and converts them to MP3s.
 
-## Features
+## What it does
 
-- **Fast Conversion**: Quick YouTube video to MP3 conversion
-- **High Quality**: 192kbps MP3 audio quality
-- **Real-time Progress**: Live download and conversion progress tracking
-- **Auto-cleanup**: Automatically removes files after 24 hours
-- **Responsive Design**: Works seamlessly on desktop and mobile devices
-- **Security**: Input validation, rate limiting, and secure file handling
+- Converts YouTube videos to MP3 format (192kbps quality)
+- Shows you what's happening while it downloads and converts
+- Cleans up old files automatically so your storage doesn't get cluttered
+- Works on whatever device you're using
+- Has some basic security stuff built in
 
-## Requirements
+## What you'll need
 
-- Python 3.8+
-- FFmpeg (required for audio conversion)
+- Python 3.8 or newer
+- FFmpeg (this is what actually handles the audio conversion)
 
-## Installation
+## Getting it running
 
-1. **Clone the repository**:
-   ```bash
-   git clone <repository-url>
-   cd youtube-mp3-downloader
-   ```
+Grab the code:
 
-2. **Install FFmpeg**:
-   - **Windows**: Download from [ffmpeg.org](https://ffmpeg.org/download.html) and add to PATH
-   - **macOS**: `brew install ffmpeg`
-   - **Linux**: `sudo apt install ffmpeg` or `sudo yum install ffmpeg`
-
-3. **Create a virtual environment**:
-   ```bash
-   python -m venv venv
-   ```
-
-4. **Activate the virtual environment**:
-   - **Windows**: `venv\Scripts\activate`
-   - **macOS/Linux**: `source venv/bin/activate`
-
-5. **Install dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-## Usage
-
-1. **Start the application**:
-   ```bash
-   python app.py
-   ```
-
-2. **Open your browser** and navigate to:
-   ```
-   http://127.0.0.1:5000
-   ```
-
-3. **Convert videos**:
-   - Paste a YouTube URL into the input field
-   - Click "Convert to MP3"
-   - Wait for the conversion to complete
-   - Download your MP3 file
-
-## Configuration
-
-You can modify settings in `app.py`:
-
-```python
-app.config['MAX_DOWNLOADS'] = 10  # Maximum concurrent downloads
-app.config['FILE_RETENTION_HOURS'] = 24  # How long to keep files
-app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # Max file size
+```bash
+git clone <repository-url>
+cd youtube-mp3-downloader
 ```
 
-## API Endpoints
+Install FFmpeg (if you don't have it already):
 
-- `GET /` - Main application page
-- `POST /download` - Start a new download
-- `GET /status/<download_id>` - Check download status
-- `GET /get_file/<download_id>` - Download the converted file
-- `POST /cleanup` - Manual cleanup of old files
-- `GET /health` - Health check endpoint
+- Windows: Download from ffmpeg.org and add it to your PATH
+- Mac: `brew install ffmpeg`
+- Linux: `sudo apt install ffmpeg` (or `yum` if that's your thing)
 
-## Security Features
+Set up Python stuff:
 
-- URL validation to ensure only YouTube URLs are processed
-- UUID-based download IDs to prevent unauthorized access
-- Thread-safe download status management
-- File retention limits
-- Rate limiting for concurrent downloads
-- Input sanitization and XSS protection
-
-## Legal Disclaimer
-
-**Important**: This tool is for educational purposes only. Users must:
-- Only download content they own or have permission to download
-- Respect copyright laws and YouTube's Terms of Service
-- Comply with all applicable local, state, and federal laws
-
-The developers are not responsible for any misuse of this application.
-
-## Troubleshooting
-
-### FFmpeg not found
-Ensure FFmpeg is installed and added to your system PATH.
-
-### Download fails
-- Check your internet connection
-- Verify the YouTube URL is valid and accessible
-- Ensure the video is not private or region-locked
-
-### Port already in use
-Change the port in `app.py`:
-```python
-app.run(debug=True, host='127.0.0.1', port=5001)  # Change 5000 to another port
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
 ```
 
-## Development
+## How to use it
 
-To run in development mode with debug enabled:
+Fire it up:
+
 ```bash
 python app.py
 ```
 
-For production deployment, use a production WSGI server like Gunicorn:
+Then just open your browser and go to http://127.0.0.1:5000
+
+Paste in a YouTube link, hit the convert button and download your MP3.
+
+## Tweaking settings
+
+If you want to mess with the config, it's in app.py:
+
+```python
+app.config['MAX_DOWNLOADS'] = 10  # how many can run at once
+app.config['FILE_RETENTION_HOURS'] = 24  # when to delete old files
+app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # max file size
+```
+
+## The endpoints
+
+These are the endpoints:
+
+- `GET /` - the main page
+- `POST /download` - starts a download
+- `GET /status/<download_id>` - checks on your download
+- `GET /get_file/<download_id>` - grabs your file
+- `POST /cleanup` - manually cleans up old files
+- `GET /health` - checks if everything's running
+
+## Heads up
+
+This is is just a learning project. Only download stuff you actually have the rights to download. Respect copyright laws and YouTube's rules.
+
+I am not responsible if you use this for something sketchy.
+
+## When stuff goes wrong
+
+- FFmpeg not working? Make sure it's installed and in your PATH.
+- Downloads failing? Could be your internet, a bad URL, or the video might be private/region-locked.
+- Port's taken? Change it in app.py:
+
+```python
+app.run(debug=True, host='127.0.0.1', port=5001)
+```
+
+## Running it for real
+
+Development mode (what you've been doing):
+
+```bash
+python app.py
+```
+
+Production (if you're actually deploying this):
+
 ```bash
 pip install gunicorn
 gunicorn -w 4 -b 0.0.0.0:5000 app:app
@@ -129,8 +104,8 @@ gunicorn -w 4 -b 0.0.0.0:5000 app:app
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+If you want to improve it, go for it.
 
 ## License
 
-This project is provided as-is for educational purposes.
+It's here, use it however you want for learning. (idk what to say here)
